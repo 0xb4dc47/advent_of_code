@@ -13,9 +13,10 @@ const ListsDifferentSizeError = error{
 pub fn main() !void {
     var lines = std.mem.tokenizeScalar(u8, input_file, '\n');
 
-    var column1 = std.ArrayList(i32).init(allocator);
+    // var column1 = std.ArrayList(i32).init(allocator);
+    var column1_map = std.AutoArrayHashMap(i32, i32).init(allocator);
     var column2 = std.ArrayList(i32).init(allocator);
-    defer column1.deinit();
+    defer column1_map.deinit();
     defer column2.deinit();
 
     while (lines.next()) |line| {
@@ -24,24 +25,39 @@ pub fn main() !void {
             if (split_line.next()) |data2| {
                 const parsed_data1 = try std.fmt.parseInt(i32, data1, 10);
                 const parsed_data2 = try std.fmt.parseInt(i32, data2, 10);
-                try column1.append(parsed_data1);
+
+                column1_map.put(parsed_data1, 0) catch {
+                    std.debug.print("Failed to insert into hashmap\n", .{});
+                    return;
+                };
                 try column2.append(parsed_data2);
             }
         }
     }
 
-    std.mem.sort(i32, column1.items, {}, comptime std.sort.asc(i32));
-    std.mem.sort(i32, column2.items, {}, comptime std.sort.asc(i32));
+    for (column2.items) |item| {
+        if (column1_map.contains(item) == false) continue;
 
-    if (column1.items.len != column2.items.len) return ListsDifferentSizeError.UnevenLists;
-    var sum: i64 = 0;
-    for (column1.items, 0..) |item1, index| {
-        const item2 = column2.items[index];
+        const val: ?i32 = column1_map.get(item);
 
-        const difference = @abs(item1 - item2);
-
-        sum += difference;
+        column1_map.put(item, val.? + 1) catch {
+            std.debug.print("Failed to insert into hashmap\n", .{});
+            return;
+        };
     }
 
-    print("The sum is: {d}", .{sum});
+    // calculate the final result
+    var sum: i64 = 0;
+    const it = column1_map.iterator();
+    while (it.next()) |entry| {
+        sum += entry.key * entry.value;
+    }
+
+    print("Final Result: {d}\n", .{sum});
 }
+
+// pub fn arrayListToDictionary(list: std.ArrayList) !std.HashMap {
+//     var map = std.AutoHashMap(i32, i32).init(allocator);
+
+//     for (list.items) |item| {}
+// }
