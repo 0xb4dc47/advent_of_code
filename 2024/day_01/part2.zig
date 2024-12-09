@@ -48,16 +48,11 @@ pub fn main() !void {
 
     // calculate the final result
     var sum: i64 = 0;
-    const it = column1_map.iterator();
-    while (it.next()) |entry| {
-        sum += entry.key * entry.value;
+
+    for (column1_map.keys()) |key| {
+        const val = column1_map.get(key).?;
+        sum += key * val;
     }
 
     print("Final Result: {d}\n", .{sum});
 }
-
-// pub fn arrayListToDictionary(list: std.ArrayList) !std.HashMap {
-//     var map = std.AutoHashMap(i32, i32).init(allocator);
-
-//     for (list.items) |item| {}
-// }
