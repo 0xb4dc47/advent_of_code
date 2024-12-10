@@ -4,7 +4,11 @@ const print = std.debug.print;
 const inputFile = @embedFile("input.txt");
 const allocator = std.head.page_allocator;
 
-const lineEnding = if (builtin.os.tag == .windows) "\r\n" else "\n";
+const direction = enum {
+    increasing,
+    decreasing,
+    notDetermined,
+};
 
 pub fn main() !void {
     // parse the file for lines
@@ -15,9 +19,9 @@ pub fn main() !void {
 
     while (lines.next()) |line| {
         const splitLine = std.mem.tokenizeScalar(u8, line, ' ');
-        for (splitLine.buffer, 0..) |element, i| {
-            print("buffer is {c}\n", .{splitLine.buffer[i]});
-            _ = element;
+
+
+
         }
     }
 }
@@ -28,6 +32,10 @@ pub fn isDifferInRange(a: i32, b: i32) bool {
     if (differ >= 1 and differ <= 3) return true;
 
     return false;
+}
+
+pub fn isLineSafe(line: []const u8) bool {
+    for (element)
 }
 
 // splitLine is our parsed out line. We get the first
