@@ -38,13 +38,17 @@ pub fn isLineSafe(line: []const u8) !bool {
     var splitLine = std.mem.tokenize(u8, line, ' ');
 
     // set the initial direction
-    var direction: directions = directions.undetermined;
+    var currentDirection: directions = directions.undetermined;
 
     // all lines are safe and dampener is available by default
     var isDampenerAvailable: bool = true;
 
     // var prev: i32 = try std.fmt.parseInt(i32, splitLine.next().?, 10);
     var prev: i32 = splitLine.next().?;
+
+    // if a problem line is found we add the index of the curr and prev to the problem indeces
+    var problemIndeces = std.ArrayList(u8).init(allocator);
+    var index: usize = 0;
 
     while (splitLine.next()) |num| {
         const curr = try std.fmt.parseInt(i32, num, 10);
@@ -53,11 +57,11 @@ pub fn isLineSafe(line: []const u8) !bool {
         const isDecreasing: bool = curr < prev;
 
         // first pass of a line the direction is undetermined
-        if (direction == directions.undetermined) {
+        if (currentDirection == directions.undetermined) {
             if (isIncreasing) {
-                direction = directions.increasing;
+                currentDirection = directions.increasing;
             } else if (isDecreasing) {
-                direction = directions.decreasing;
+                currentDirection = directions.decreasing;
             } else {
                 if (isDampenerAvailable) {
                     isDampenerAvailable = false;
@@ -68,7 +72,7 @@ pub fn isLineSafe(line: []const u8) !bool {
         }
 
         // check if the direction is maintained for this window
-        const isWrongDirection: bool = (direction == directions.increasing and isDecreasing) or (direction == directions.decreasing and isIncreasing);
+        const isWrongDirection: bool = (currentDirection == directions.increasing and isDecreasing) or (currentDirection == directions.decreasing and isIncreasing);
 
         if (!isDifferInRange(prev, curr) or isWrongDirection) {
             if (isDampenerAvailable) {
