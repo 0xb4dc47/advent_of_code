@@ -1,7 +1,10 @@
-import os
+# import os
+# import re
 
 let fileName = "input.txt"
 
-let content = readFile(fileName)
-
-echo content
+try:
+    let content = readFile(fileName)
+    echo content
+except OSError:
+    echo "Error: Unable to open or read the file."
